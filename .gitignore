@@ -1,0 +1,7 @@
+test/
+__pycache__/
+web/scrub.py
+.vercel
+web/_test*
+ERRORS.md
+launch-posts.md

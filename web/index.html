@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doppler Scrub</title>
+<meta name="description" content="A plane overhead can place your video on a map. Doppler Scrub removes the aircraft tones and mains hum that give it away, on your own device.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect width='30' height='30' rx='7' fill='%230e0d13'/%3E%3Cpath d='M3 10 C11 10 13 20 27 20' fill='none' stroke='%23f1eff6' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='15' cy='15' r='2.6' fill='%23ff3d8b'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://dopplerscrub.com/">
+<meta property="og:url" content="https://dopplerscrub.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Doppler Scrub">
+<meta property="og:title" content="Doppler Scrub">
+<meta property="og:description" content="The sky in your video knows where you are. Remove the plane tones and mains hum that give it away, on your own device.">
+<meta property="og:image" content="https://dopplerscrub.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Doppler Scrub: a particle spectrogram where a plane's sliding tone breaks apart at the scrub line, under the headline The sky in your video knows where you are">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Doppler Scrub">
+<meta name="twitter:description" content="The sky in your video knows where you are. Remove the plane tones and mains hum that give it away, on your own device.">
+<meta name="twitter:image" content="https://dopplerscrub.com/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Instrument+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="brand.css">
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header class="wrap bar">
+  <a class="mark" href="#top" aria-label="Doppler Scrub">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M2 9 C11 9 13 21 28 21" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="13 5 40"/>
+      <circle cx="15" cy="15" r="2.4" fill="var(--signal)"/>
+    </svg>
+    Doppler Scrub
+  </a>
+  <nav>
+    <a class="opt" href="#how">How it leaks</a>
+    <a class="opt" href="#compare">Compare</a>
+    <a class="gh" href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener" title="Star on GitHub"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg><span class="sr">Star on GitHub</span></a>
+    <a class="cta" href="/app">Open the app</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <h1>The sky in your video <em>knows where</em> you are</h1>
+    </div>
+    <div class="stage" id="stage" aria-label="Animated spectrogram: aircraft tones enter from the right and are removed when they reach the scrub line">
+      <canvas id="field" aria-hidden="true"></canvas>
+      <div class="tag head" id="tag-head">Scrub</div>
+      <div class="tag" id="tag-past">← Clean</div>
+      <div class="tag" id="tag-now">Incoming</div>
+      <div class="tag hz" id="tag-100">100 Hz</div>
+      <div class="tag hz" id="tag-300">300 Hz</div>
+      <div class="tag hz" id="tag-500">500 Hz</div>
+    </div>
+    <div class="wrap">
+      <div class="readout" id="readout" aria-live="off">
+        <div><span>Pass</span><b id="r-pass">01</b></div>
+        <div><span>Source</span><b id="r-type">Turboprop</b></div>
+        <div><span>Blade pass</span><b id="r-f0">98 Hz</b></div>
+        <div><span>Heard now</span><b class="sig" id="r-f">112.4 Hz</b></div>
+        <div><span>Ground speed</span><b id="r-kt">146 kt</b></div>
+        <div><span>Closest pass</span><b id="r-cpa">in 0:08</b></div>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Sound">
+          <button type="button" id="snd-off" aria-pressed="true">Sound off</button>
+          <button type="button" id="snd-raw" aria-pressed="false">Raw</button>
+          <button type="button" id="snd-clean" aria-pressed="false">Scrubbed</button>
+        </div>
+        <p>Move across the field: you are a sound source too.</p>
+      </div>
+
+      <div class="lede col">
+        <p>A plane overhead leaves a sliding tone in your audio. Its pitch drops as it passes, and the shape of that drop gives away its speed and the second it flew over you. Match two of them against public flight tracks and a clip can be placed on a map.</p>
+        <p>Doppler Scrub finds those tones and removes them, along with mains hum, on your own phone. Voices, birds, wind and room tone stay.</p>
+        <div class="actions">
+          <a class="btn primary" href="/app">Clean a video <small>Free</small></a>
+          <a class="btn" href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg> Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="how">
+    <p class="eyebrow">How a clip gets located</p>
+    <h2>Three steps from a sound to a street</h2>
+    <div class="steps">
+      <ol>
+        <li><span class="n">01</span><h3>Record</h3><p>A turboprop's blades pass 98 times a second. On the ground you hear 128 Hz as it comes in and 80 Hz as it leaves.</p></li>
+        <li><span class="n">02</span><h3>Measure</h3><p>The two pitches give the speed: <code>f′ = f · c / (c + v)</code>. The steepest point of the slide is the moment it was closest.</p></li>
+        <li><span class="n">03</span><h3>Match</h3><p>ADS-B logs every aircraft's position, every second, in public. One pass gives a line on the map. Two passes 15 minutes apart give a point.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block wrap" id="compare">
+    <p class="eyebrow">What changes in the audio</p>
+    <h2>Drag to compare</h2>
+    <figure class="compare">
+      <div class="cmp" id="cmp">
+        <canvas id="cmp-canvas" aria-hidden="true"></canvas>
+        <span class="lab l">Scrubbed</span><span class="lab r">Original</span>
+        <div class="handle" id="cmp-handle"></div>
+      </div>
+      <input class="cmp-range" id="cmp-range" type="range" min="0" max="100" value="46" aria-label="Compare scrubbed and original">
+      <figcaption>Spectrogram of a 2-minute clip, 0 to 600 Hz. Two flyovers slide down through the original; mains hum sits on 50 Hz steps. The scrubbed side keeps the noise floor, so nothing traces the removed curves.</figcaption>
+    </figure>
+
+    <div class="split">
+      <div class="gone">
+        <h3>Removed</h3>
+        <ul>
+          <li><b>Aircraft and vehicle tones</b><span>sliding, 60–6000 Hz</span></li>
+          <li><b>Mains hum</b><span>50 / 60 Hz + harmonics</span></li>
+          <li><b>GPS and capture time</b><span>file metadata</span></li>
+        </ul>
+      </div>
+      <div class="kept">
+        <h3>Kept</h3>
+        <ul>
+          <li><b>Voices</b><span>pitch moves too fast to match</span></li>
+          <li><b>Birds, wind, traffic</b><span>broadband or brief</span></li>
+          <li><b>Fans and fridges</b><span>steady, local</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="block wrap oss" id="source">
+    <p class="eyebrow">Open source · MIT</p>
+    <h2>Don't take our word for it</h2>
+    <div class="col">
+      <p>"Nothing is uploaded" is only worth something if you can check it. The whole scrub is one Python file of about 550 lines. The page runs that same file in your browser through Pyodide, and Mediabunny with the browser's own codecs handles the video. Read it, run it on your own clips, or make the detector better.</p>
+      <pre><code>git clone https://github.com/danielcanton/doppler-scrub
+python3 scrub.py clip.mp4 clean.mp4 --plot before_after.png</code></pre>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg> Star on GitHub</a>
+        <a class="btn" href="/app">Clean a video</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Doppler Scrub · <a href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener">MIT licensed on GitHub</a> · runs on your device, your video is never uploaded · anonymous page counts, no cookies</span>
+  <a href="/app">Open the app</a>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="field.js"></script>
+<script src="landing.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+test/
+web/_test*
+*.mp4
+*.mov
+*.wav
+__pycache__/

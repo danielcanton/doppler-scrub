@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doppler Scrub · Clean a video</title>
+<meta name="description" content="Remove the aircraft tones and mains hum that can place a video on a map. Runs on your device; your video is never uploaded.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect width='30' height='30' rx='7' fill='%230e0d13'/%3E%3Cpath d='M3 10 C11 10 13 20 27 20' fill='none' stroke='%23f1eff6' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='15' cy='15' r='2.6' fill='%23ff3d8b'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://dopplerscrub.com/app">
+<meta property="og:url" content="https://dopplerscrub.com/app">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Doppler Scrub">
+<meta property="og:title" content="Doppler Scrub · Clean a video">
+<meta property="og:description" content="Remove the plane tones and mains hum that can place a video on a map. Runs on your device; your video is never uploaded.">
+<meta property="og:image" content="https://dopplerscrub.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Doppler Scrub: a particle spectrogram where a plane's sliding tone breaks apart at the scrub line, under the headline The sky in your video knows where you are">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Doppler Scrub · Clean a video">
+<meta name="twitter:description" content="Remove the plane tones and mains hum that can place a video on a map. Runs on your device; your video is never uploaded.">
+<meta name="twitter:image" content="https://dopplerscrub.com/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Instrument+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="brand.css">
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header class="wrap bar">
+  <a class="mark" href="/" aria-label="Doppler Scrub home">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M2 9 C11 9 13 21 28 21" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="13 5 40"/>
+      <circle cx="15" cy="15" r="2.4" fill="var(--signal)"/>
+    </svg>
+    Doppler Scrub
+  </a>
+  <nav><a class="opt" href="/#how">How it leaks</a><a class="gh" href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener" title="Star on GitHub"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg><span class="sr">Star on GitHub</span></a></nav>
+</header>
+
+<div class="stage band" id="stage" data-compact="1" aria-hidden="true">
+  <canvas id="field"></canvas>
+  <div class="tag head" id="tag-head">Scrub</div>
+</div>
+
+<main class="wrap app">
+  <section id="home" class="view">
+    <p class="eyebrow">Runs on your device · nothing is uploaded</p>
+    <h1 class="title">Clean a video</h1>
+    <p class="sub">Removes aircraft tones, mains hum and location metadata. Voices, birds, wind and room tone stay.</p>
+    <div class="tiles">
+      <button class="tile rec" id="btn-record" type="button"><span class="ico" aria-hidden="true"></span><b>Record</b><small>Cleaned before it's saved</small></button>
+      <button class="tile" id="btn-pick" type="button">
+        <svg class="ico" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 19V5M8 11l6-6 6 6M5 23h18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <b>Choose a video</b><small>From your camera roll or files</small>
+      </button>
+    </div>
+    <input type="file" id="file" accept="video/*,audio/*" hidden>
+    <label class="switch"><input type="checkbox" id="strict"><span class="track"></span><span><b>Strict mode.</b> Also remove every long steady tone: fans, engines, fridges. More private, less natural.</span></label>
+    <p class="fine">The first run downloads the engine, about 40 MB, then it's cached. Works best on clips under 3 minutes.</p>
+    <p class="error" id="home-error" hidden></p>
+  </section>
+
+  <section id="camera" class="view" hidden>
+    <div class="viewfinder">
+      <video id="preview" playsinline muted autoplay></video>
+      <span class="rec-time" id="timer" hidden>● <span id="timer-t">0:00</span></span>
+    </div>
+    <div class="cam-controls">
+      <button class="ghost" id="btn-cam-cancel" type="button">Cancel</button>
+      <button class="shutter" id="btn-rec-toggle" type="button" aria-label="Start recording"><span></span></button>
+      <button class="ghost" id="btn-flip" type="button">Flip camera</button>
+    </div>
+    <p class="fine">The browser's own noise suppression is off, so the scrub hears what the mic hears.</p>
+  </section>
+
+  <section id="work" class="view" hidden aria-live="polite">
+    <p class="eyebrow" id="work-file">Your video</p>
+    <h1 class="title">Scrubbing</h1>
+    <ol class="steps-live" id="steps">
+      <li data-step="engine"><span class="st"></span><span class="nm">Load engine</span><span class="info"></span></li>
+      <li data-step="extract"><span class="st"></span><span class="nm">Read audio</span><span class="info"></span></li>
+      <li data-step="scrub"><span class="st"></span><span class="nm">Find and remove tones</span><span class="info"></span></li>
+      <li data-step="mux"><span class="st"></span><span class="nm">Build clean file</span><span class="info"></span></li>
+    </ol>
+    <p class="detail" id="detail"></p>
+    <div class="actions" id="work-actions" hidden><button class="btn" id="btn-back" type="button">Back</button></div>
+  </section>
+
+  <section id="result" class="view" hidden>
+    <div class="res-head">
+      <div><p class="eyebrow" id="res-file">Your video</p><h1 class="title">Clean</h1></div>
+    </div>
+    <div class="player">
+      <video id="out-video" controls playsinline></video>
+      <audio id="out-audio" controls hidden></audio>
+    </div>
+    <div class="actions">
+      <a class="btn primary" id="btn-download" href="#" download>Download</a>
+      <button class="btn" id="btn-smaller" type="button" hidden>Make smaller</button>
+      <a class="btn primary" id="btn-download-small" href="#" download hidden>Download smaller</a>
+      <button class="btn" id="btn-share" type="button" hidden>Save or share</button>
+      <button class="btn" id="btn-again" type="button">Clean another</button>
+    </div>
+    <div class="readout four">
+      <div><span>Tones removed</span><b class="sig" id="s-doppler">0</b></div>
+      <div><span>Mains hum</span><b id="s-hum">0</b></div>
+      <div><span>Metadata</span><b>Stripped</b></div>
+      <div><span>Audio changed</span><b id="s-changed">0%</b></div>
+    </div>
+
+    <div class="spec-head">
+      <p class="eyebrow">Spectrogram</p>
+      <div class="seg" role="group" aria-label="Spectrogram view">
+        <button type="button" id="v-compare" aria-pressed="true">Compare</button>
+        <button type="button" id="v-removed" aria-pressed="false">Removed only</button>
+      </div>
+      <label class="mini"><input type="checkbox" id="mark" checked> Mark removed</label>
+    </div>
+    <div class="cmp" id="cmp">
+      <canvas id="cmp-canvas" aria-label="Spectrogram of the clip"></canvas>
+      <canvas id="cmp-marks" class="marks" aria-hidden="true"></canvas>
+      <span class="lab l">Scrubbed</span><span class="lab r">Original</span>
+      <div class="handle" id="cmp-handle"></div>
+      <div class="yaxis" id="yaxis"></div>
+    </div>
+    <input class="cmp-range" id="cmp-range" type="range" min="0" max="100" value="50" aria-label="Compare scrubbed and original">
+    <div class="xaxis"><span>0 s</span><span id="x-end"></span></div>
+    <details class="tracks"><summary>What was removed</summary>
+      <table><thead><tr><th>Kind</th><th>Time</th><th>Pitch</th></tr></thead><tbody></tbody></table>
+    </details>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Doppler Scrub · <a href="https://github.com/danielcanton/doppler-scrub" target="_blank" rel="noopener">MIT licensed on GitHub</a> · runs on your device, your video is never uploaded · anonymous page counts, no cookies</span>
+  <a href="/">About</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+<script src="field.js"></script>
+<script src="inspect.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
